@@ -1,6 +1,7 @@
 package net._1di.piproserver.utils;
 
 import net._1di.piproserver.pojo.Result;
+import org.springframework.stereotype.Component;
 
 /**
  * @BelongsProject: PiPROServer
@@ -9,6 +10,7 @@ import net._1di.piproserver.pojo.Result;
  * @Description: 用于返回对象的工具类
  * @CreateTime: 2023-04-16  09:46
  */
+@Component
 public class ResultUtil {
 
     /**
@@ -17,7 +19,7 @@ public class ResultUtil {
      * @param data 数据
      * @return
      */
-    public static Result success(String message,Object data){
+    public Result success(String message,Object data){
         return new Result(200,true,message,data);
     }
 
@@ -26,7 +28,7 @@ public class ResultUtil {
      * @param message 消息
      * @return
      */
-    public static Result success(String message){
+    public Result success(String message){
         return new Result(200,true,message,null);
     }
     /**
@@ -34,7 +36,7 @@ public class ResultUtil {
      * @param message 消息
      * @return
      */
-    public static Result fail(String message){
+    public  Result fail(String message){
         return new Result(403,false,message,null);
     }
     /**
@@ -43,8 +45,26 @@ public class ResultUtil {
      * @param data 数据
      * @return
      */
-    public static Result fail(String message,Object data){
+    public Result fail(String message,Object data){
         return new Result(403,false,message,data);
     }
 
+    /**
+     * 异常返回值
+     * @param message
+     * @param data
+     * @return
+     */
+    public Result exception(String message,Object data){
+        return new Result(500,false,message,data);
+    }
+
+    /**
+     * 异常返回值
+     * @param message
+     * @return
+     */
+    public  Result exception(String message){
+        return new Result(500,false,message,null);
+    }
 }

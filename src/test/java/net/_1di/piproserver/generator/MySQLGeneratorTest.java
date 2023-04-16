@@ -32,7 +32,7 @@ public class MySQLGeneratorTest {
         FastAutoGenerator.create("jdbc:mysql://localhost:3306/pipro?serverTimezone=Asia/Shanghai", "root", "123123")
                 .globalConfig(builder -> {
                     builder.author("pphboy") // 设置作者
-//                            .enableSwagger() // 开启 swagger 模式
+                            .enableSwagger() // 开启 swagger 模式
                             .fileOverride() // 覆盖已生成文件
                             .outputDir("C:\\Users\\Administrator\\Desktop\\"); // 指定输出目录
                 })

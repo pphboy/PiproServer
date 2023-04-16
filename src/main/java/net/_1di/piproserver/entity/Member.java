@@ -1,10 +1,21 @@
 package net._1di.piproserver.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * <p>
@@ -16,48 +27,46 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Accessors(chain = true)
 @TableName("pi_member")
+@ApiModel(value = "Member对象", description = "用户")
+@JsonIgnoreProperties({"password","salt"})
 public class Member implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 会员标识
-     */
-    private Integer memberId;
+    @ApiModelProperty("会员标识")
+    @TableId(type =IdType.AUTO)
+    private Long memberId;
 
-    /**
-     * 会员登录名
-     */
+    @ApiModelProperty("会员登录名")
+    @TableField("member_name")
     private String memberName;
 
-    /**
-     * 密码
-     */
+    @ApiModelProperty("密码")
     private String password;
 
-    /**
-     * 盐
-     */
+    @ApiModelProperty("盐")
     private String salt;
 
-    /**
-     * 邮箱
-     */
+    @ApiModelProperty("邮箱")
     private String email;
 
-    /**
-     * 权限类型
-     */
-    private String authorityType;
+    @ApiModelProperty("权限类型")
+    private Integer authorityType;
 
-    /**
-     * 注册时间
-     */
+    @ApiModelProperty("注册时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//    @DateTimeFormat(pattern=”yyyy-MM-dd HH:mm:ss”)
+    @TableField(fill = FieldFill.INSERT)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime registerTime;
 
-    /**
-     * 更新时间
-     */
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("更新时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

@@ -1,8 +1,12 @@
 package net._1di.piproserver.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,37 +21,27 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("pi_project")
+@ApiModel(value = "Project对象", description = "项目")
 public class Project implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 项目标识
-     */
+    @ApiModelProperty("项目标识")
+    @TableId(value = "project_id", type = IdType.AUTO)
     private Integer projectId;
 
-    /**
-     * 项目名
-     */
+    @ApiModelProperty("项目名")
     private String projectName;
 
-    /**
-     * 项目介绍
-     */
+    @ApiModelProperty("项目介绍")
     private String projectIntro;
 
-    /**
-     * 项目状态
-     */
+    @ApiModelProperty("项目状态")
     private Short projectStatus;
 
-    /**
-     * 创建时间
-     */
+    @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
+    @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
 }

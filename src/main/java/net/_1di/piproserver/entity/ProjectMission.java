@@ -1,8 +1,12 @@
 package net._1di.piproserver.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,62 +21,42 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("pi_project_mission")
+@ApiModel(value = "ProjectMission对象", description = "项目任务")
 public class ProjectMission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 任务标识
-     */
-    private Integer missionId;
+    @ApiModelProperty("任务标识")
+    @TableId(type = IdType.ASSIGN_UUID)
+    private String missionId;
 
-    /**
-     * 列表标识
-     */
+    @ApiModelProperty("列表标识")
     private Integer kanbanListId;
 
-    /**
-     * 任务名
-     */
+    @ApiModelProperty("任务名")
     private String missionTitle;
 
-    /**
-     * 任务介绍
-     */
+    @ApiModelProperty("任务介绍")
     private String missionIntro;
 
-    /**
-     * 任务排序
-     */
+    @ApiModelProperty("任务排序")
     private Integer missionOrder;
 
-    /**
-     * 创建时间
-     */
+    @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
 
-    /**
-     * 开始时间
-     */
+    @ApiModelProperty("开始时间")
     private LocalDateTime startTime;
 
-    /**
-     * 结束时间
-     */
+    @ApiModelProperty("结束时间")
     private LocalDateTime endTime;
 
-    /**
-     * 更新时间
-     */
+    @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
 
-    /**
-     * 删除状态
-     */
+    @ApiModelProperty("删除状态")
     private Short deleteStatus;
 
-    /**
-     * 任务状态
-     */
+    @ApiModelProperty("任务状态")
     private Short missionStatus;
 }
