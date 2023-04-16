@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+dev:
+  dev: abc
+spring:
+  datasource:
+    username: root
+    password: 123123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/basic
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: 10
+        max-wait: -1
+        max-idle: 10
