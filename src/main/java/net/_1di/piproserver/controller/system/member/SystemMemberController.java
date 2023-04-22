@@ -95,7 +95,7 @@ public class SystemMemberController {
                 new QueryWrapper<Member>().lambda().eq(Member::getEmail, registerMember.getEmail()) // 邮箱
         );
         if(ObjectUtils.isNotEmpty(selectOne)){
-            return resultUtil.fail("该邮箱已经被注册");
+            return resultUtil.fail("该邮箱已经被注册了");
         }
         MemberConfig memberConfig = memberService.memberRegister(registerMember);
         return resultUtil.success("注册成功",memberConfig);

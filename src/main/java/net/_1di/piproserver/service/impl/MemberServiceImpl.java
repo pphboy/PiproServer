@@ -1,5 +1,6 @@
 package net._1di.piproserver.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import net._1di.piproserver.controller.system.member.vo.RegisterMember;
 import net._1di.piproserver.entity.Member;
 import net._1di.piproserver.mapper.MemberMapper;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
  * @since 2023-04-16
  */
 @Service
+@Slf4j
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements IMemberService {
 
     @Autowired
@@ -75,6 +77,17 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         // 放到REDIS里
         setMemberConfig(member.getMemberName(),uuid,memberConfig,3*24*3600);
         return memberConfig;
+    }
+
+    @Override
+    public Member getMemberByToken(String token) {
+        Object object = redisUtil.get(token);
+        if(ObjectUtils.isEmpty(object)){
+            log.info("InValid Token => {} ",token);
+            return null;
+        }
+        // 强转
+        return (Member) object;
     }
 
     /**

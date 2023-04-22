@@ -22,13 +22,12 @@ public class RegisterMember {
 
     @ApiModelProperty("用户名")
     @NotEmpty(message = "用户名不能为空")
-//    @Length(max = 10,min = 6,message = "用户名在6~10位之间")
-    @Length(max = 50,min = 6,message = "用户名在6~10位之间")
+    @Length(max = 18,min = 6,message = "用户名在6~18位之间")
     private String username;
 
     @ApiModelProperty("密码")
     @NotEmpty(message = "密码不能为空")
-    @Length(max = 16,min = 6,message = "密码在6~16之间")
+    @Length(max = 18,min = 6,message = "密码在6~18之间")
     private String password;
 
     @ApiModelProperty("邮箱")

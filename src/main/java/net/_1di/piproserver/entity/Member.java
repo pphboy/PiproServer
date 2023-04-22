@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
@@ -31,6 +32,7 @@ import lombok.experimental.Accessors;
 @TableName("pi_member")
 @ApiModel(value = "Member对象", description = "用户")
 @JsonIgnoreProperties({"password","salt"})
+@ToString
 public class Member implements Serializable {
 
     private static final long serialVersionUID = 1L;

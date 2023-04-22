@@ -43,7 +43,7 @@ public class MySQLGeneratorTest {
                 })
                 .strategyConfig(builder -> {
                     builder
-//                            .addInclude("*") // 设置需要生成的表名，不写就是全部
+                            .addInclude("pi_authority,pi_member_authority") // 设置需要生成的表名，不写就是全部
                             .addTablePrefix("pi_" )
                             .entityBuilder()
                             .enableLombok() // 开启lombok

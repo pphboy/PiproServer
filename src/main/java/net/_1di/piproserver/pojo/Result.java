@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @ApiModel(value = "Result", description = "系统的返回结果")
 public class Result {
+
     @ApiModelProperty("系统操作码")
     private int code;
     @ApiModelProperty("本次操作状态")

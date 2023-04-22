@@ -28,4 +28,11 @@ public interface IMemberService extends IService<Member> {
      * @return
      */
     public MemberConfig memberLogin(Member member);
+
+    /**
+     * 根据口令获取redis中用户的 状态
+     * @param token 用户口令
+     * @return
+     */
+    public Member getMemberByToken(String token);
 }

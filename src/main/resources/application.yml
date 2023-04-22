@@ -20,6 +20,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: /src/main/**
+
 
 logging:
   file:
@@ -32,6 +37,7 @@ logging:
   group:
     pdebug:
       - net._1di.piproserver.mapper
+      - net._1di.piproserver
     pinfo:
       - net._1di.piproserver.component
       - net._1di.piproserver.controller.api
