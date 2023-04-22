@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,12 +31,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     IProjectMembersService projectMembersService;
 
     @Override
+    @Transactional
     public boolean saveProject(Project project, Integer memberId) {
         save(project);
-
         ProjectMembers creator=  new ProjectMembers(project.getProjectId(),memberId,100);
-        projectMembersService.save(creator);
-        return false;
+        return projectMembersService.save(creator);
     }
 
     @Override

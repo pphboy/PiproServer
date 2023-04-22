@@ -1,4 +1,4 @@
-package net._1di.piproserver.controller.api;
+package net._1di.piproserver.controller.api.file;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;

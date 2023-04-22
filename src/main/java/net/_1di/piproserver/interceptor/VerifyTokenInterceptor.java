@@ -1,26 +1,27 @@
 package net._1di.piproserver.interceptor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net._1di.piproserver.annotations.VerifyPermission;
 import net._1di.piproserver.annotations.VerifyToken;
+import net._1di.piproserver.entity.Authority;
 import net._1di.piproserver.entity.Member;
+import net._1di.piproserver.entity.MemberAuthority;
 import net._1di.piproserver.service.IAuthorityService;
+import net._1di.piproserver.service.IMemberAuthorityService;
 import net._1di.piproserver.service.IMemberService;
 import net._1di.piproserver.utils.ResultUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
+import java.util.List;
 
 /**
  * @BelongsProject: PiPROServer
@@ -35,7 +36,10 @@ public class VerifyTokenInterceptor implements HandlerInterceptor {
     @Autowired
     IMemberService memberService;
     @Autowired
+    IMemberAuthorityService memberAuthorityService;
+    @Autowired
     IAuthorityService authorityService;
+
     @Autowired
     ResultUtil resultUtil;
 
@@ -43,7 +47,7 @@ public class VerifyTokenInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(handler instanceof HandlerMethod){
+        if (handler instanceof HandlerMethod) {
             HandlerMethod hm = (HandlerMethod) handler;
             // 判断是否有VerifyToken注解
             // 这里 VerifyPermission包括了VerifyToken
@@ -82,16 +86,30 @@ public class VerifyTokenInterceptor implements HandlerInterceptor {
             // 判断权限是否在用户权限内，如果不在，返回 权限不足，非法访问
             // 拿到值
             String value = handler.getMethodAnnotation(VerifyPermission.class).value();
-            String[] ruleList = {"DEFAULT"};
-            for(String tmp: ruleList){
+            // 查询用户的权限IDS
+            List<MemberAuthority> authorityIds = memberAuthorityService.list(new QueryWrapper<MemberAuthority>().lambda()
+                    .eq(MemberAuthority::getMemberId, member.getMemberId()));
+            if(authorityIds.size() == 0){
+                sendResult(response, 403, "权限不足，非法访问");
+                return  false;
+            }
+            // 查询权限列表
+            List<Authority> ruleList = authorityService.list(new QueryWrapper<Authority>().lambda()
+                    .in(Authority::getAuthorityId,
+                            // 下面是将 上面authorityIds转成数组
+                            authorityIds.stream().map(a -> a.getAuthorityId()).toArray())
+            );
+
+            for (Authority authority : ruleList) {
                 // 如果有一个相等直接放行
-                if(tmp.equals(value)){
+                // 拿权限的Name跟这个方法的value进行对比
+                if (authority.getAuthorityName().equals(value)) {
                     // 只有放行的时候才需要设置这个member
-                    request.setAttribute("member",member);
+                    request.setAttribute("member", member);
                     return true;
                 }
             }
-            sendResult(response,403,"权限不足，非法访问");
+            sendResult(response, 403, "权限不足，非法访问");
             return false;
         }
     }
@@ -121,6 +139,7 @@ public class VerifyTokenInterceptor implements HandlerInterceptor {
             sendResult(response,403,"登录已失效，请重新登录");
             return false;
         }else {
+            // 符合以上面的条件，就可以访问 VerifyToken
             request.setAttribute("member",member);
             return true;
         }
@@ -134,9 +153,12 @@ public class VerifyTokenInterceptor implements HandlerInterceptor {
      * @throws IOException
      */
     public void sendResult(HttpServletResponse response,int status,String message) throws IOException {
-        response.getWriter().print(objectMapper.writeValueAsBytes(
+        String json = objectMapper.writeValueAsString(
                 resultUtil.fail(message)
-        ));
+        );
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().print(json);
         response.setStatus(status);
     }
 

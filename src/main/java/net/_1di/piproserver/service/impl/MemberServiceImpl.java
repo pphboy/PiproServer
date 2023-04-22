@@ -81,13 +81,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Override
     public Member getMemberByToken(String token) {
-        Object object = redisUtil.get(token);
+        Object object = getMember(token);
         if(ObjectUtils.isEmpty(object)){
             log.info("InValid Token => {} ",token);
             return null;
         }
+
         // 强转
-        return (Member) object;
+        return ((MemberConfig) object).getMember();
     }
 
     /**
@@ -104,5 +105,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
         redisUtil.set("pipro:member:"+token,data,time);
         redisUtil.set("pipro:member:name:"+name,token,time);
+    }
+
+    public Object getMember(String token){
+        return redisUtil.get("pipro:member:"+token);
     }
 }

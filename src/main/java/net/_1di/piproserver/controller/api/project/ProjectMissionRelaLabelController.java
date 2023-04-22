@@ -1,4 +1,4 @@
-package net._1di.piproserver.controller.api;
+package net._1di.piproserver.controller.api.project;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @since 2023-04-16
  */
 @Controller
-@RequestMapping("/piproserver/label")
-public class LabelController {
+@RequestMapping("/piproserver/projectMissionRelaLabel")
+public class ProjectMissionRelaLabelController {
 
 }

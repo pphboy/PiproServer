@@ -1,4 +1,4 @@
-package net._1di.piproserver.controller.api;
+package net._1di.piproserver.controller.api.log;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @since 2023-04-16
  */
 @Controller
-@RequestMapping("/piproserver/member")
-public class MemberController {
+@RequestMapping("/piproserver/operationLog")
+public class OperationLogController {
 
 }

@@ -39,7 +39,7 @@ public class Member implements Serializable {
 
     @ApiModelProperty("会员标识")
     @TableId(type =IdType.AUTO)
-    private Long memberId;
+    private Integer memberId;
 
     @ApiModelProperty("会员登录名")
     @TableField("member_name")
