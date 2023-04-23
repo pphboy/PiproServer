@@ -14,6 +14,7 @@ import net._1di.piproserver.service.IProjectMissionService;
 import net._1di.piproserver.service.IProjectService;
 import net._1di.piproserver.utils.ResultUtil;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -64,8 +65,14 @@ public class ProjectMissionController {
         if(projectService.isMemberJoinTheProject(member.getMemberId(),currentProject.getProjectId())){
             log.info("[USER => {}] 创建了 一个 任务 [{}]",member,missionVo.getMissionTitle());
             try{
-                projectMissionService.createMission(missionVo);
-                return resultUtil.success("添加任务成功");
+                // 更新
+                if(StringUtils.isNotEmpty(missionVo.getMissionId())){
+                    return projectMissionService.updateMission(missionVo);
+                }else {
+                    // 创建
+                    projectMissionService.createMission(missionVo);
+                    return resultUtil.success("添加任务成功");
+                }
             }catch (Exception e){
                 e.printStackTrace();
                 return resultUtil.fail("非法数据异常，已记录，请查看日志分析");

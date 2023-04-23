@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net._1di.piproserver.entity.Project;
 import net._1di.piproserver.entity.ProjectMembers;
 import net._1di.piproserver.mapper.ProjectMapper;
-import net._1di.piproserver.service.IKanbanListService;
-import net._1di.piproserver.service.ILabelService;
-import net._1di.piproserver.service.IProjectMembersService;
-import net._1di.piproserver.service.IProjectService;
+import net._1di.piproserver.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Autowired
     ILabelService labelService;
+
+    @Autowired
+    IMemberService memberService;
 
     @Override
     @Transactional
@@ -74,8 +74,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public Project getProjectDetail(Integer projectId) {
         Project project = getById(projectId);
+        // 看板列表
         project.setKanbanList(kanbanListService.getKabanListByProjectId(projectId));
+        // 标签列表
         project.setLabelList(labelService.getLabelListByProjectId(projectId));
+        // 用户列表
+        project.setMemberList(memberService.getMembersByProjectId(projectId));
         return project;
     }
 }

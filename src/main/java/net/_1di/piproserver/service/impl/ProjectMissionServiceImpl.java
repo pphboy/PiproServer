@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import net._1di.piproserver.controller.api.project.kanban.vo.MissionVo;
 import net._1di.piproserver.entity.*;
 import net._1di.piproserver.mapper.ProjectMissionMapper;
+import net._1di.piproserver.pojo.Result;
 import net._1di.piproserver.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net._1di.piproserver.utils.ResultUtil;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,8 @@ import java.util.List;
 @Slf4j
 @Service
 public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper, ProjectMission> implements IProjectMissionService {
+    @Autowired
+    ResultUtil resultUtil;
 
     @Autowired
     IMemberService memberService;
@@ -77,38 +82,92 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createMission(MissionVo missionVo) {
+        ProjectMission projectMission = convertProjectMission(missionVo);
+
+        // 保存任务
+        save(projectMission);
+        // 添加 标签
+        if(ObjectUtils.isNotEmpty(missionVo.getLabelList())){
+            for(Integer labelId: missionVo.getLabelList()){
+                Label tempLabel = labelService.getById(labelId);
+                if(ObjectUtils.isEmpty(tempLabel)) {
+                    log.info("{} 标签不存在",labelId);
+                    throw new RuntimeException("标签不存在");
+                }
+                // 保存
+                projectMissionRelaLabelService.save(new ProjectMissionRelaLabel(labelId,projectMission.getMissionId()));
+            }
+        }
+        if(ObjectUtils.isNotEmpty(missionVo.getMemberList())){
+            // 添加 用户
+            for (Integer memberId : missionVo.getMemberList()){
+                Member tempMember = memberService.getById(memberId);
+                if(ObjectUtils.isEmpty(tempMember)) {
+                    log.info("{} 用户不存在",memberId);
+                    throw new RuntimeException("用户不存在");
+                }
+                // 保存
+                missionMemberService.save(new MissionMember(projectMission.getMissionId(), memberId));
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result updateMission(MissionVo missionVo) {
+        if(ObjectUtils.isEmpty(getById(missionVo.getMissionId()))){
+            return resultUtil.fail("任务不存在，您可能正在非法操作");
+        }
+        // 先删掉之前的，用户，然后重新添加一遍
+        ProjectMission projectMission = convertProjectMission(missionVo);
+        // 更新任务详情
+        updateById(projectMission);
+        // 删除之前的label
+        projectMissionRelaLabelService.remove(new QueryWrapper<ProjectMissionRelaLabel>().lambda().eq(ProjectMissionRelaLabel::getMissionId,missionVo.getMissionId()));
+        // 删除之前的用户
+        missionMemberService.remove(new QueryWrapper<MissionMember>().lambda().eq(MissionMember::getMissionId,missionVo.getMissionId()));
+        // 重新添加
+        // 添加 标签
+        if(ObjectUtils.isNotEmpty(missionVo.getLabelList())){
+            for(Integer labelId: missionVo.getLabelList()){
+                Label tempLabel = labelService.getById(labelId);
+                if(ObjectUtils.isEmpty(tempLabel)) {
+                    log.info("{} 标签不存在",labelId);
+                    throw new RuntimeException("标签不存在");
+                }
+                // 保存
+                projectMissionRelaLabelService.save(new ProjectMissionRelaLabel(labelId,projectMission.getMissionId()));
+            }
+        }
+        if(ObjectUtils.isNotEmpty(missionVo.getMemberList())){
+            // 添加 用户
+            for (Integer memberId : missionVo.getMemberList()){
+                Member tempMember = memberService.getById(memberId);
+                if(ObjectUtils.isEmpty(tempMember)) {
+                    log.info("{} 用户不存在",memberId);
+                    throw new RuntimeException("用户不存在");
+                }
+                // 保存
+                missionMemberService.save(new MissionMember(projectMission.getMissionId(), memberId));
+            }
+        }
+
+        return resultUtil.success("编辑任务成功");
+    }
+
+    public ProjectMission convertProjectMission(MissionVo missionVo){
         ProjectMission projectMission = new ProjectMission();
+        if(StringUtils.isNotEmpty(missionVo.getMissionId())){
+            projectMission.setMissionId(missionVo.getMissionId());
+        }
         projectMission.setMissionTitle(missionVo.getMissionTitle());
         projectMission.setMissionIntro(missionVo.getMissionIntro());
         projectMission.setStartTime(missionVo.getStartTime());
         projectMission.setEndTime(missionVo.getEndTime());
         projectMission.setKanbanListId(missionVo.getKanbanListId());
-
-        // 保存任务
-        save(projectMission);
-
-        // 添加 标签
-        for(Integer labelId: missionVo.getLabelList()){
-            Label tempLabel = labelService.getById(labelId);
-            if(ObjectUtils.isEmpty(tempLabel)) {
-                log.info("{} 标签不存在",labelId);
-                throw new RuntimeException("标签不存在");
-            }
-            // 保存
-            projectMissionRelaLabelService.save(new ProjectMissionRelaLabel(labelId,projectMission.getMissionId()));
-        }
-
-        // 添加 用户
-        for (Integer memberId : missionVo.getMemberList()){
-            Member tempMember = memberService.getById(memberId);
-            if(ObjectUtils.isEmpty(tempMember)) {
-                log.info("{} 用户不存在",memberId);
-                throw new RuntimeException("用户不存在");
-            }
-            // 保存
-            missionMemberService.save(new MissionMember(projectMission.getMissionId(), memberId));
-        }
-
-        return true;
+        return projectMission;
     }
+
 }

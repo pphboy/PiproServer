@@ -55,9 +55,15 @@ public class Project implements Serializable {
     private String projectName;
 
     @TableField(exist = false)
+    @ApiModelProperty("看板列表")
     private List<KanbanList> kanbanList;
 
     @TableField(exist = false)
+    @ApiModelProperty("用户列表")
+    public List<Member> memberList;
+
+    @TableField(exist = false)
+    @ApiModelProperty("标签列表")
     private List<Label> labelList;
 
     @ApiModelProperty("项目介绍")

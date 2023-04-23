@@ -5,6 +5,8 @@ import net._1di.piproserver.entity.Member;
 import com.baomidou.mybatisplus.extension.service.IService;
 import net._1di.piproserver.pojo.MemberConfig;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -35,4 +37,11 @@ public interface IMemberService extends IService<Member> {
      * @return
      */
     public Member getMemberByToken(String token);
+
+    /**
+     * 根据项目ID获取所有有效用户列表
+     * @param projectId
+     * @return
+     */
+    public List<Member> getMembersByProjectId(Integer projectId);
 }

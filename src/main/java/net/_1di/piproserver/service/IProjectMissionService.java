@@ -3,6 +3,7 @@ package net._1di.piproserver.service;
 import net._1di.piproserver.controller.api.project.kanban.vo.MissionVo;
 import net._1di.piproserver.entity.ProjectMission;
 import com.baomidou.mybatisplus.extension.service.IService;
+import net._1di.piproserver.pojo.Result;
 
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface IProjectMissionService extends IService<ProjectMission> {
      * @param missionVo
      */
     boolean createMission(MissionVo missionVo);
+
+    Result updateMission(MissionVo missionVo);
 }

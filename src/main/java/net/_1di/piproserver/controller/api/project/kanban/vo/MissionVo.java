@@ -31,6 +31,8 @@ import java.util.Set;
 @ApiModel(value = "MissionView对象")
 public class MissionVo {
 
+    private String missionId;
+
     @ApiModelProperty("列表标识")
     @NotNull(message = "列表必须存在")
     private Integer kanbanListId;

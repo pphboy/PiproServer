@@ -1,12 +1,15 @@
 package net._1di.piproserver.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import net._1di.piproserver.controller.system.member.vo.RegisterMember;
 import net._1di.piproserver.entity.Member;
+import net._1di.piproserver.entity.ProjectMembers;
 import net._1di.piproserver.mapper.MemberMapper;
 import net._1di.piproserver.pojo.MemberConfig;
 import net._1di.piproserver.service.IMemberService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net._1di.piproserver.service.IProjectMembersService;
 import net._1di.piproserver.utils.RedisUtil;
 import net._1di.piproserver.utils.UUIDUtil;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -14,6 +17,8 @@ import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -32,6 +37,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    IProjectMembersService projectMembersService;
 
     @Override
     public MemberConfig memberRegister(RegisterMember member) {
@@ -86,9 +94,19 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             log.info("InValid Token => {} ",token);
             return null;
         }
-
         // 强转
         return ((MemberConfig) object).getMember();
+    }
+
+    @Override
+    public List<Member> getMembersByProjectId(Integer projectId) {
+        List<ProjectMembers> memberIdList = projectMembersService.list(new QueryWrapper<ProjectMembers>().lambda()
+                .eq(ProjectMembers::getProjectId, projectId)
+                .ge(ProjectMembers::getProjectAuthority, 0));// 大于等于0才是有效用户
+        if (ObjectUtils.isNotEmpty(memberIdList)) {
+            return list(new QueryWrapper<Member>().lambda().in(Member::getMemberId,
+                    memberIdList.stream().map(a->a.getMemberId()).toArray()));
+        }else return null;
     }
 
     /**
