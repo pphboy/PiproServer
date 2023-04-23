@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net._1di.piproserver.entity.Project;
 import net._1di.piproserver.entity.ProjectMembers;
 import net._1di.piproserver.mapper.ProjectMapper;
+import net._1di.piproserver.service.IKanbanListService;
+import net._1di.piproserver.service.ILabelService;
 import net._1di.piproserver.service.IProjectMembersService;
 import net._1di.piproserver.service.IProjectService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -30,6 +32,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Autowired
     IProjectMembersService projectMembersService;
 
+    @Autowired
+    IKanbanListService kanbanListService;
+
+    @Autowired
+    ILabelService labelService;
+
     @Override
     @Transactional
     public boolean saveProject(Project project, Integer memberId) {
@@ -50,5 +58,24 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 memberList.stream().map(a -> a.getProjectId()).toArray()        // 这个相当于是直接把memberList里的list做成 项目ID集合 类似于 {1,2,3,5}
         ));
         return projectList;
+    }
+
+    @Override
+    public boolean isMemberJoinTheProject(Integer memberId, Integer projectId) {
+        ProjectMembers projectMember = projectMembersService.getOne(new QueryWrapper<ProjectMembers>().lambda()
+                .eq(ProjectMembers::getMemberId, memberId)
+                .eq(ProjectMembers::getProjectId, projectId));
+
+        if(ObjectUtils.isNotEmpty(projectMember))
+            if(projectMember.getProjectAuthority() >= 0) return true;
+        return false;
+    }
+
+    @Override
+    public Project getProjectDetail(Integer projectId) {
+        Project project = getById(projectId);
+        project.setKanbanList(kanbanListService.getKabanListByProjectId(projectId));
+        project.setLabelList(labelService.getLabelListByProjectId(projectId));
+        return project;
     }
 }

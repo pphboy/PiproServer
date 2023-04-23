@@ -49,17 +49,86 @@ public class VerifyTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
             HandlerMethod hm = (HandlerMethod) handler;
-            // 判断是否有VerifyToken注解
-            // 这里 VerifyPermission包括了VerifyToken
-            // 权重更高的排在前面
-            if(ObjectUtils.isNotEmpty(hm.getMethodAnnotation(VerifyPermission.class))){
-                return verifyPermissions(request,response,hm);
-            } else if(ObjectUtils.isNotEmpty(hm.getMethodAnnotation(VerifyToken.class))){
-                return verifyToken(request,response,handler);
-            }
+            return verify(request,response,hm);
         }
         // 如果没有Token
         return HandlerInterceptor.super.preHandle(request, response, handler);
+    }
+
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @param hm
+     * @return
+     * @throws IOException
+     */
+    private boolean verify(HttpServletRequest request, HttpServletResponse response, HandlerMethod hm) throws IOException {
+        // 判断是否有VerifyToken注解
+        // 这里 VerifyPermission包括了VerifyToken
+        // 权重更高的排在前面
+        // 方法的权重大于类
+
+        if(ObjectUtils.isNotEmpty(hm.getMethodAnnotation(VerifyPermission.class))){
+            return verifyPermissions(request,response,hm);
+        } else if(ObjectUtils.isNotEmpty(hm.getMethodAnnotation(VerifyToken.class))){
+            return verifyToken(request,response,hm);
+        }
+        //如果方法没有再看类有没有
+        else if(ObjectUtils.isNotEmpty(hm.getMethod().getDeclaringClass().getAnnotation(VerifyPermission.class))){
+            return verifyClassPermissions(request,response,hm);
+        }else if(ObjectUtils.isNotEmpty(hm.getMethod().getDeclaringClass().getAnnotation(VerifyToken.class))){
+            return verifyToken(request,response,hm);
+        }
+//        上面是类的
+        // 如果都不满足上面的条件，则说明没有使用注解，直接行行
+        return true;
+    }
+
+    private boolean verifyClassPermissions(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler) throws IOException {
+        String token = request.getHeader("Authorization");
+        if(StringUtils.isEmpty(token)){
+            sendResult(response,403,"口令为空，非法访问");
+            return false;
+        }
+        // 通过Token获取Mapper
+        Member member = memberService.getMemberByToken(token);
+        if(ObjectUtils.isEmpty(member)){
+            log.debug("Token {} 不存在 member",token);
+            // 有Token不存在Member，则说明登录已失效
+            sendResult(response,403,"登录已失效，请重新登录");
+            return false;
+        }else {
+            // 判断权限是否在用户权限内，如果不在，返回 权限不足，非法访问
+            // 拿到值
+            String value = handler.getMethod().getDeclaringClass().getAnnotation(VerifyPermission.class).value();
+            // 查询用户的权限IDS
+            List<MemberAuthority> authorityIds = memberAuthorityService.list(new QueryWrapper<MemberAuthority>().lambda()
+                    .eq(MemberAuthority::getMemberId, member.getMemberId()));
+            if(authorityIds.size() == 0){
+                sendResult(response, 403, "权限不足，非法访问");
+                return  false;
+            }
+            // 查询权限列表
+            List<Authority> ruleList = authorityService.list(new QueryWrapper<Authority>().lambda()
+                    .in(Authority::getAuthorityId,
+                            // 下面是将 上面authorityIds转成数组
+                            authorityIds.stream().map(a -> a.getAuthorityId()).toArray())
+            );
+
+            for (Authority authority : ruleList) {
+                // 如果有一个相等直接放行
+                // 拿权限的Name跟这个方法的value进行对比
+                if (authority.getAuthorityName().equals(value)) {
+                    // 只有放行的时候才需要设置这个member
+                    request.setAttribute("member", member);
+                    return true;
+                }
+            }
+            sendResult(response, 403, "权限不足，非法访问");
+            return false;
+        }
     }
 
     /**

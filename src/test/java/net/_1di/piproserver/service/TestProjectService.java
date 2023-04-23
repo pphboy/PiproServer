@@ -1,11 +1,12 @@
 package net._1di.piproserver.service;
 
-import net._1di.piproserver.entity.Project;
+import net._1di.piproserver.entity.*;
 import net._1di.piproserver.utils.UUIDUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -21,6 +22,52 @@ public class TestProjectService {
 
     @Autowired
     UUIDUtil uuidUtil;
+    @Autowired
+    IKanbanListService kanbanListService;
+    @Autowired
+    IProjectMissionService projectMissionService;
+    @Autowired
+    IMissionMemberService missionMemberService;
+    @Autowired
+    ILabelService labelService;
+
+    @Test
+    public void testInitProject(){
+
+    }
+    @Test
+    public  void testAddKan(){
+        Project project = new Project(uuidUtil.uuid()+"软件工程",uuidUtil.uuid()+"软件工程实践项目",0);
+        projectService.saveProject(project,2);
+        addKaban(project.getProjectId());;
+        addLabel(project.getProjectId());
+    }
+
+    public void addLabel(Integer projectId){
+        labelService.save(new Label(projectId,"紧急","danger"));
+        labelService.save(new Label(projectId,"一般","primary"));
+        labelService.save(new Label(projectId,"不重要","info"));
+    }
+
+    public void addKaban(Integer pid){
+        KanbanList kanban= new KanbanList(pid,"Todo名一");
+        kanbanListService.save(kanban);
+        for(int i = 0; i < 15 ;i++){
+            ProjectMission projectMission = new ProjectMission(kanban.getKanbanListId(),
+                    "任务名"+i , "介绍"+uuidUtil.uuid(), i, LocalDateTime.now(), LocalDateTime.now(), 0, 1);
+            projectMissionService.save(projectMission);
+            missionMemberService.save(new MissionMember(projectMission.getMissionId(),2));
+        }
+
+        KanbanList kanban2= new KanbanList(pid,"Todo名二");
+        kanbanListService.save(kanban2);
+        for(int i = 0; i < 15 ;i++){
+            ProjectMission projectMission = new ProjectMission(kanban2.getKanbanListId(),
+                    "任务名"+i , "介绍"+uuidUtil.uuid(), i, LocalDateTime.now(), LocalDateTime.now(), 0, 1);
+            projectMissionService.save(projectMission);
+            missionMemberService.save(new MissionMember(projectMission.getMissionId(),2));
+        }
+    }
     @Test
     public void testAddProject(){
         short status = 0;

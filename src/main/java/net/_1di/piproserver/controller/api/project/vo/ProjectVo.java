@@ -5,7 +5,6 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 /**
  * @BelongsProject: PiPROServer
@@ -16,6 +15,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @Accessors(chain = true)
 public class ProjectVo {
+
+    private Integer projectId;
 
     @NotEmpty
     @Length(max = 30,message = "项目名不能超过30个字")

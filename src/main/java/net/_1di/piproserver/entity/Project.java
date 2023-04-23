@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,6 +35,12 @@ public class Project implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public Project(Integer projectId, String projectName, String projectIntro) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectIntro = projectIntro;
+    }
+
     public Project(String projectName, String projectIntro, Integer projectStatus) {
         this.projectName = projectName;
         this.projectIntro = projectIntro;
@@ -46,6 +53,12 @@ public class Project implements Serializable {
 
     @ApiModelProperty("项目名")
     private String projectName;
+
+    @TableField(exist = false)
+    private List<KanbanList> kanbanList;
+
+    @TableField(exist = false)
+    private List<Label> labelList;
 
     @ApiModelProperty("项目介绍")
     private String projectIntro;
