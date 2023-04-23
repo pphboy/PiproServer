@@ -32,7 +32,6 @@ public class MissionMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     public MissionMember(String missionId, Integer memberId) {
         this.missionId = missionId;
         this.memberId = memberId;

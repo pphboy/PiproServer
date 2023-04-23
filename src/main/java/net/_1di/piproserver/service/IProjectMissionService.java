@@ -1,5 +1,6 @@
 package net._1di.piproserver.service;
 
+import net._1di.piproserver.controller.api.project.kanban.vo.MissionVo;
 import net._1di.piproserver.entity.ProjectMission;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -21,4 +22,10 @@ public interface IProjectMissionService extends IService<ProjectMission> {
      * @return
      */
     public List<ProjectMission> getMissionsByKanbanId(Integer kanbanId);
+
+    /**
+     * 创建一个项目
+     * @param missionVo
+     */
+    boolean createMission(MissionVo missionVo);
 }

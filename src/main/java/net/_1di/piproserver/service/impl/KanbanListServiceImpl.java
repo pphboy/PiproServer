@@ -30,7 +30,8 @@ public class KanbanListServiceImpl extends ServiceImpl<KanbanListMapper, KanbanL
 
     @Override
     public List<KanbanList> getKabanListByProjectId(Integer projectId) {
-        List<KanbanList> kanbanList = list(new QueryWrapper<KanbanList>().lambda().eq(KanbanList::getProjectId, projectId));
+        List<KanbanList> kanbanList = list(new QueryWrapper<KanbanList>().lambda()
+                .eq(KanbanList::getProjectId, projectId));
         kanbanList.forEach(a->{
             // 通过KanbanId获取MissionList
             a.setMissionList(projectMissionService.getMissionsByKanbanId(a.getKanbanListId()));

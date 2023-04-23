@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -21,6 +23,8 @@ import lombok.Setter;
 @Setter
 @TableName("pi_project_mission_rela_label")
 @ApiModel(value = "ProjectMissionRelaLabel对象", description = "任务拥有多个标签")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProjectMissionRelaLabel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,5 +34,5 @@ public class ProjectMissionRelaLabel implements Serializable {
     private Integer labelId;
 
     @ApiModelProperty("任务标识")
-    private Integer missionId;
+    private String missionId;
 }

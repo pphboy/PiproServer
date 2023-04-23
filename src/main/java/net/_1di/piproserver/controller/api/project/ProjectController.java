@@ -75,7 +75,6 @@ public class ProjectController {
                                       @PathVariable("id")Integer projectId){
         if(projectService.isMemberJoinTheProject(member.getMemberId(),projectId))
         {
-
             return resultUtil.success("获取项目详情成功",projectService.getProjectDetail(projectId));
         }
         log.info("{} MemberID 非法访问 {} ",member.getMemberName(),member.getMemberId());

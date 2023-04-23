@@ -51,6 +51,9 @@ public class ProjectMission implements Serializable {
     @TableField(exist = false)
     private List<Member> memberList;
 
+    @TableField(exist = false)
+    private List<Label> labelList;
+
     @ApiModelProperty("任务名")
     private String missionTitle;
 

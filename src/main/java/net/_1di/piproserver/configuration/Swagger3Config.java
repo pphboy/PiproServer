@@ -14,6 +14,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * @Author: 徐一杰
@@ -21,15 +22,14 @@ import springfox.documentation.spring.web.plugins.Docket;
  * @Description: Swagger3配置文件
 */
 @SpringBootConfiguration
-@EnableOpenApi
+@EnableSwagger2
 public class Swagger3Config {
     /**
      *   application中还配置了mvc，因为springboot2.6.1与swagger3不兼容
      */
-
     @Bean
     public Docket createRestApi() {
-        return new Docket(DocumentationType.OAS_30)
+        return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 // ture 启用Swagger3.0， false 禁用（生产环境要禁用）
                 .enable(true)
@@ -45,7 +45,7 @@ public class Swagger3Config {
 
     @Bean
     public Docket createRestSystem() {
-        return new Docket(DocumentationType.OAS_30)
+        return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 // ture 启用Swagger3.0， false 禁用（生产环境要禁用）
                 .enable(true)
@@ -70,5 +70,8 @@ public class Swagger3Config {
                 .version("0.1")
                 .build();
     }
+
+
+
 }
 
