@@ -54,7 +54,7 @@ public class ProjectMissionController {
     public Result createMission(@RequestAttribute("member") Member member, @Valid @RequestBody MissionVo missionVo) {
         // 判断看板是否为空
         KanbanList kanban = kanbanListService.getById(missionVo.getKanbanListId());
-        if (ObjectUtils.isEmpty(kanban)) {
+        if (ObjectUtils.isEmpty(kanban) || kanban.getKanbanStatus() == -1) {
             log.info("{} 非法访问 ，看板 {} 不存在", member.getMemberName(), missionVo.getKanbanListId());
             return resultUtil.fail("非法访问，看板不存在");
         }

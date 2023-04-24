@@ -25,6 +25,7 @@ public class WebConfiguration extends WebMvcConfigurationSupport {
                         "/swagger**/**",
                         "/webjars/**",
                         "/v3/**",
+                        "/v2/**",
                         "/doc.html").order(5);
     }
     @Override

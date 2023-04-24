@@ -2,6 +2,7 @@ package net._1di.piproserver.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net._1di.piproserver.entity.KanbanList;
+import net._1di.piproserver.enums.KanbanStatus;
 import net._1di.piproserver.mapper.KanbanListMapper;
 import net._1di.piproserver.service.IKanbanListService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,7 +32,10 @@ public class KanbanListServiceImpl extends ServiceImpl<KanbanListMapper, KanbanL
     @Override
     public List<KanbanList> getKabanListByProjectId(Integer projectId) {
         List<KanbanList> kanbanList = list(new QueryWrapper<KanbanList>().lambda()
-                .eq(KanbanList::getProjectId, projectId));
+                .eq(KanbanList::getProjectId, projectId)
+                // 已删除的项目不能要
+                .ne(KanbanList::getKanbanStatus, KanbanStatus.DELETE));
+
         kanbanList.forEach(a->{
             // 通过KanbanId获取MissionList
             a.setMissionList(projectMissionService.getMissionsByKanbanId(a.getKanbanListId()));
