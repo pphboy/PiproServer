@@ -1,5 +1,7 @@
 package net._1di.piproserver.service;
 
+import net._1di.piproserver.controller.api.project.project.dto.MissionTodayAndLastDto;
+import net._1di.piproserver.entity.Member;
 import net._1di.piproserver.entity.Project;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -33,4 +35,21 @@ public interface IProjectService extends IService<Project> {
      * @return
      */
     Project getProjectDetail(Integer projectId);
+
+    /**
+     * 通member获取用户列表
+     * @param member
+     * @return
+     */
+    MissionTodayAndLastDto getMissionListByMember(Member member,Integer project);
+
+
+    /**
+     * 获取member下的所有mission
+     * @param member
+     * @param project
+     * @return
+     */
+    List<String> getMemberAllMissionFromProject(Member member,Integer project);
+
 }

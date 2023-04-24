@@ -91,10 +91,7 @@ public class KanbanListController {
             return resultUtil.fail("非法访问，你未参加这个项目");
         }
 
-        // -1 就是删除
-        kanban.setKanbanStatus(KanbanStatus.DELETE);
-        kanbanListService.updateById(kanban);
-        return resultUtil.success("删除看板成功");
+        return kanbanListService.deleteKanbanById(kanban);
     }
 
     @ApiOperation("更新看板名称")
