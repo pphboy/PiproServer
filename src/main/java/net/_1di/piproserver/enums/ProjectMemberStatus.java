@@ -26,4 +26,9 @@ public interface ProjectMemberStatus {
      */
     int ADMIN = 100;
 
+    /**
+     * 申请加入的状态
+     */
+    int APPLY = -3;
+
 }

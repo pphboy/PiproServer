@@ -67,7 +67,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public List<Project> getProjectById(Integer memberId) {
         List<ProjectMembers> memberList = projectMembersService.list(new QueryWrapper<ProjectMembers>().lambda()
-                .eq(ProjectMembers::getMemberId, memberId));
+                .eq(ProjectMembers::getMemberId, memberId)
+                // 大于等于默认状态
+                .ge(ProjectMembers::getProjectAuthority, ProjectMemberStatus.DEFAULT)
+        );
         // 如果为空，直接返回null 即可
         if(ObjectUtils.isEmpty(memberList)) return null;
 
@@ -80,8 +83,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public boolean isMemberJoinTheProject(Integer memberId, Integer projectId) {
+        // 查询的用户得是合法的
         ProjectMembers projectMember = projectMembersService.getOne(new QueryWrapper<ProjectMembers>().lambda()
                 .eq(ProjectMembers::getMemberId, memberId)
+                .ge(ProjectMembers::getProjectAuthority,0)
                 .eq(ProjectMembers::getProjectId, projectId));
 
         if(ObjectUtils.isNotEmpty(projectMember))

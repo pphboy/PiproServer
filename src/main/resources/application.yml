@@ -4,6 +4,8 @@ server:
 dev:
   dev: abc
 spring:
+  main:
+    allow-circular-references: true
   datasource:
     username: root
     password: 123123
