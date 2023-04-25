@@ -4,6 +4,7 @@ import net._1di.piproserver.controller.api.project.kanban.vo.MissionVo;
 import net._1di.piproserver.entity.Member;
 import net._1di.piproserver.entity.ProjectMission;
 import com.baomidou.mybatisplus.extension.service.IService;
+import net._1di.piproserver.pojo.MissionV2;
 import net._1di.piproserver.pojo.Result;
 
 import java.util.List;
@@ -39,4 +40,10 @@ public interface IProjectMissionService extends IService<ProjectMission> {
     boolean createMission(MissionVo missionVo);
 
     Result updateMission(MissionVo missionVo);
+
+    /**
+     * 为MissionV2设置状态
+     * @param missionList
+     */
+    void setMissionV2DetailInfo(List<MissionV2> missionList);
 }

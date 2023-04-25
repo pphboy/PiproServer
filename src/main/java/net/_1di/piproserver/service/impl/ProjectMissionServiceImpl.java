@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net._1di.piproserver.controller.api.project.kanban.vo.MissionVo;
 import net._1di.piproserver.entity.*;
 import net._1di.piproserver.mapper.ProjectMissionMapper;
+import net._1di.piproserver.pojo.MissionV2;
 import net._1di.piproserver.pojo.Result;
 import net._1di.piproserver.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -76,6 +77,35 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
      */
     @Override
     public void setMissionDetailInfo(List<ProjectMission> missionList){
+        // 如果不为空，则设置用户信息
+        if(ObjectUtils.isNotEmpty(missionList)){
+            missionList.forEach(a->{
+                // 根据任务的ID查询用户的ID数组
+                List<MissionMember> missionMembers = missionMemberService.list(new QueryWrapper<MissionMember>().lambda()
+                        .eq(MissionMember::getMissionId, a.getMissionId()));
+                // mission查出来也是个空的数组，所以不用担心为null
+                if(ObjectUtils.isNotEmpty(missionMembers)){
+                    List<Member> memberList = memberService.list(new QueryWrapper<Member>().lambda()
+                            .in(Member::getMemberId,
+                                    missionMembers.stream().map(b -> b.getMemberId()).toArray())
+                    );
+                    a.setMemberList(memberList);
+                }
+                // 查询Label数据
+                List<ProjectMissionRelaLabel> relaList = projectMissionRelaLabelService.list(new QueryWrapper<ProjectMissionRelaLabel>().lambda()
+                        .eq(ProjectMissionRelaLabel::getMissionId, a.getMissionId()));
+                // 如果有Label则把Label查出来
+                if(ObjectUtils.isNotEmpty(relaList)){
+                    List<Label> labelList = labelService.list(new QueryWrapper<Label>().lambda().in(Label::getLabelId
+                            , relaList.stream().map(c -> c.getLabelId()).toArray()
+                    ));
+                    a.setLabelList(labelList);
+                }
+            });
+        }
+    }
+    @Override
+    public void setMissionV2DetailInfo(List<MissionV2> missionList){
         // 如果不为空，则设置用户信息
         if(ObjectUtils.isNotEmpty(missionList)){
             missionList.forEach(a->{

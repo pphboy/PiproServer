@@ -10,6 +10,8 @@ import net._1di.piproserver.enums.MissionOrder;
 import net._1di.piproserver.enums.MissionStatus;
 import net._1di.piproserver.enums.ProjectMemberStatus;
 import net._1di.piproserver.mapper.ProjectMapper;
+import net._1di.piproserver.mapper.ProjectMissionMapper;
+import net._1di.piproserver.pojo.MissionV2;
 import net._1di.piproserver.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.ObjectUtils;
@@ -50,6 +52,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Autowired
     IMissionMemberService missionMemberService;
+
+    @Autowired
+    ProjectMissionMapper projectMissionMapper;
 
     @Override
     @Transactional
@@ -167,37 +172,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      * 在所有看板下所有任务里找到自己的任务
      * 相接查中间表就可以了
      * @param member
-     * @param missionOrder
      * @return
      */
     @Override
-    public List<ProjectMissionDto> getAllMissionOfMember(Member member, MissionOrder missionOrder) {
-        List<ProjectMissionDto> projectMissionDtos = new ArrayList<>();
-
-        List<Project> projectList = getProjectById(member.getMemberId());
-
-        projectList.forEach(project->{
-            // 获取项目下的每个看板
-            List<KanbanList> kanbanList = kanbanListService.getKabanListByProjectId(project.getProjectId());
-            kanbanList.forEach(kanban->{
-                // 在所有看板下所有任务里找到自己的任务
-                // 获取自己当前kanban的MissionID
-                List<MissionMember> missionMemberLIst = missionMemberService.list(new QueryWrapper<MissionMember>().lambda()
-                        .eq(MissionMember::getMemberId, member.getMemberId())
-                );
-                if(ObjectUtils.isNotEmpty(missionMemberLIst)){
-
-                    // 如果当前看板，当前用户的所有任务
-                    List<ProjectMission> projectMission = projectMissionService.getMissionsByKanbanIdAndMemberId(kanban.getKanbanListId(),member);
-                    for (ProjectMission mission : projectMission) {
-                        projectMissionDtos.add(new ProjectMissionDto(project,mission));
-                    }
-                }
-
-            });
-        });
-
-        return projectMissionDtos;
+    public List<MissionV2> getAllMissionOfMember(Member member) {
+        List<MissionV2> missionList = projectMissionMapper.getMissionsByMemberId(member.getMemberId());
+        projectMissionService.setMissionV2DetailInfo(missionList);
+        return missionList;
     }
 
     /**

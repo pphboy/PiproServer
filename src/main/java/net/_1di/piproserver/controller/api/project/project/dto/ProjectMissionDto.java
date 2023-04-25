@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import net._1di.piproserver.entity.Project;
 import net._1di.piproserver.entity.ProjectMission;
+import net._1di.piproserver.pojo.MissionV2;
 
 /**
  * @BelongsProject: PiPROServer
@@ -25,6 +26,7 @@ public class ProjectMissionDto {
 
     @ApiModelProperty("所在项目")
     private Project project;
+
     @ApiModelProperty("任务名")
-    private ProjectMission projectMission;
+    private MissionV2 projectMission;
 }

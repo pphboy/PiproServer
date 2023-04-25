@@ -7,6 +7,7 @@ import net._1di.piproserver.entity.Project;
 import com.baomidou.mybatisplus.extension.service.IService;
 import net._1di.piproserver.entity.ProjectMission;
 import net._1di.piproserver.enums.MissionOrder;
+import net._1di.piproserver.pojo.MissionV2;
 
 import java.util.List;
 
@@ -60,6 +61,6 @@ public interface IProjectService extends IService<Project> {
      * @param member
      * @return
      */
-    List<ProjectMissionDto> getAllMissionOfMember(Member member, MissionOrder missionOrder);
+    List<MissionV2> getAllMissionOfMember(Member member) ;
 }
 

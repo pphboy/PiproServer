@@ -101,7 +101,7 @@ public class ProjectController {
     public Result getMissionOfMember(@RequestAttribute("member") Member member){
         return resultUtil.success("获取任务成功",
                 // 按 更新时间进行排序
-                projectService.getAllMissionOfMember(member, MissionOrder.UPDATE_TIME));
+                projectService.getAllMissionOfMember(member));
     }
 
 }
