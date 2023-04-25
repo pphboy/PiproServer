@@ -50,6 +50,32 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
                 .eq(ProjectMission::getKanbanListId, kanbanId)
                 .orderByDesc(ProjectMission::getUpdateTime));
 
+        this.setMissionDetailInfo(missionList);
+        return missionList;
+    }
+
+    @Override
+    public List<ProjectMission> getMissionsByKanbanIdAndMemberId(Integer kanbanId, Member member) {
+        List<MissionMember> missionMemberList = missionMemberService.list(new QueryWrapper<MissionMember>().lambda()
+                .eq(MissionMember::getMemberId,member.getMemberId()));
+
+        // 自己的所有任务里，为当下看板的 任务
+        List<ProjectMission> missionList = list(new QueryWrapper<ProjectMission>()
+                .lambda()
+                .eq(ProjectMission::getKanbanListId, kanbanId)
+                .in(ProjectMission::getMissionId,missionMemberList.stream().map(a->a.getMissionId()).toArray())
+                .orderByDesc(ProjectMission::getUpdateTime));
+        // 设置用户详详情信息
+        this.setMissionDetailInfo(missionList);
+        return missionList;
+    }
+
+    /**
+     * 设置任务列表详情
+     * @param missionList
+     */
+    @Override
+    public void setMissionDetailInfo(List<ProjectMission> missionList){
         // 如果不为空，则设置用户信息
         if(ObjectUtils.isNotEmpty(missionList)){
             missionList.forEach(a->{
@@ -76,7 +102,6 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
                 }
             });
         }
-        return missionList;
     }
 
     @Override

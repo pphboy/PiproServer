@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import net._1di.piproserver.controller.system.member.vo.RegisterMember;
 import net._1di.piproserver.entity.Member;
+import net._1di.piproserver.entity.MissionMember;
 import net._1di.piproserver.entity.ProjectMembers;
 import net._1di.piproserver.mapper.MemberMapper;
 import net._1di.piproserver.pojo.MemberConfig;
 import net._1di.piproserver.service.IMemberService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net._1di.piproserver.service.IMissionMemberService;
 import net._1di.piproserver.service.IProjectMembersService;
 import net._1di.piproserver.utils.RedisUtil;
 import net._1di.piproserver.utils.UUIDUtil;
@@ -40,6 +42,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Autowired
     IProjectMembersService projectMembersService;
+
+    @Autowired
+    IMissionMemberService missionMemberService;
 
     @Override
     public MemberConfig memberRegister(RegisterMember member) {
@@ -107,6 +112,22 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             return list(new QueryWrapper<Member>().lambda().in(Member::getMemberId,
                     memberIdList.stream().map(a->a.getMemberId()).toArray()));
         }else return null;
+    }
+
+    @Override
+    public List<Member> getMembersByMissionId(String missionId) {
+        // 查询中间表
+        List<MissionMember> missionMemberList = missionMemberService.list(
+                // 获取当前任务所有用户的ID
+           new QueryWrapper<MissionMember>().lambda().eq(MissionMember::getMissionId,missionId)
+        );
+        if(ObjectUtils.isEmpty(missionMemberList)) return null;
+
+        return list(
+                new QueryWrapper<Member>().lambda()
+                        .in(Member::getMemberId
+                                ,missionMemberList.stream().map(a->a.getMemberId()).toArray())
+        );
     }
 
     /**

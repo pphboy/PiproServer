@@ -1,10 +1,14 @@
 package net._1di.piproserver.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net._1di.piproserver.controller.api.project.project.dto.MissionTodayAndLastDto;
+import net._1di.piproserver.controller.api.project.project.dto.ProjectMissionDto;
 import net._1di.piproserver.entity.*;
 import net._1di.piproserver.enums.KanbanStatus;
+import net._1di.piproserver.enums.MissionOrder;
 import net._1di.piproserver.enums.MissionStatus;
+import net._1di.piproserver.enums.ProjectMemberStatus;
 import net._1di.piproserver.mapper.ProjectMapper;
 import net._1di.piproserver.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * <p>
@@ -111,20 +114,34 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         MissionTodayAndLastDto missionTodayAndLastDto = new MissionTodayAndLastDto();
 //
         // endTime大于今天，就是今日待办
-        missionTodayAndLastDto.setToday(projectMissionService.list(new QueryWrapper<ProjectMission>().lambda()
+        missionTodayAndLastDto.setToday(
+                projectMissionService.list(new QueryWrapper<ProjectMission>().lambda()
                 .in(ProjectMission::getMissionId,missionMemberList.stream().map(a->a.getMissionId()).toArray())
                 // 项目状态必须为0
                 .eq(ProjectMission::getMissionStatus, MissionStatus.DEFAULT)
                 .gt(ProjectMission::getEndTime, LocalDateTime.now())
         ));
+        // 查询Member放到任务里
+        if(ObjectUtils.isNotEmpty(missionTodayAndLastDto.getToday())){
+            missionTodayAndLastDto.getToday().forEach(a->{
+                a.setMemberList(memberService.getMembersByMissionId(a.getMissionId()));
+            });
+        }
 
         // endTime小于今天 逾期
-        missionTodayAndLastDto.setOvertime(projectMissionService.list(new QueryWrapper<ProjectMission>().lambda()
+        missionTodayAndLastDto.setOvertime(
+                projectMissionService.list(new QueryWrapper<ProjectMission>().lambda()
                 .in(ProjectMission::getMissionId,missionMemberList.stream().map(a->a.getMissionId()).toArray())
                 // 项目状态必须为0
                 .eq(ProjectMission::getMissionStatus, MissionStatus.DEFAULT)
                 .le(ProjectMission::getEndTime, LocalDateTime.now())
         ));
+        // 查询Member放到任务里
+        if(ObjectUtils.isNotEmpty(missionTodayAndLastDto.getOvertime())){
+            missionTodayAndLastDto.getOvertime().forEach(a->{
+                a.setMemberList(memberService.getMembersByMissionId(a.getMissionId()));
+            });
+        }
 
         return missionTodayAndLastDto;
     }
@@ -145,4 +162,64 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         missionList.forEach(a->missionIds.add(a.getMissionId()));
         return missionIds;
     }
+
+    /**
+     * 在所有看板下所有任务里找到自己的任务
+     * 相接查中间表就可以了
+     * @param member
+     * @param missionOrder
+     * @return
+     */
+    @Override
+    public List<ProjectMissionDto> getAllMissionOfMember(Member member, MissionOrder missionOrder) {
+        List<ProjectMissionDto> projectMissionDtos = new ArrayList<>();
+
+        List<Project> projectList = getProjectById(member.getMemberId());
+
+        projectList.forEach(project->{
+            // 获取项目下的每个看板
+            List<KanbanList> kanbanList = kanbanListService.getKabanListByProjectId(project.getProjectId());
+            kanbanList.forEach(kanban->{
+                // 在所有看板下所有任务里找到自己的任务
+                // 获取自己当前kanban的MissionID
+                List<MissionMember> missionMemberLIst = missionMemberService.list(new QueryWrapper<MissionMember>().lambda()
+                        .eq(MissionMember::getMemberId, member.getMemberId())
+                );
+                if(ObjectUtils.isNotEmpty(missionMemberLIst)){
+
+                    // 如果当前看板，当前用户的所有任务
+                    List<ProjectMission> projectMission = projectMissionService.getMissionsByKanbanIdAndMemberId(kanban.getKanbanListId(),member);
+                    for (ProjectMission mission : projectMission) {
+                        projectMissionDtos.add(new ProjectMissionDto(project,mission));
+                    }
+                }
+
+            });
+        });
+
+        return projectMissionDtos;
+    }
+
+    /**
+     * 这是自定义的一个扩展，如果后面需要设置一些操作时，可以用这个在前端就传值过来，然后直接设置其排序方式就可以了
+     * @param lambdaQueryWrapper
+     * @param sort
+     * @return
+     */
+    private void setMemberSortStatus(
+            LambdaQueryWrapper<ProjectMission> lambdaQueryWrapper, MissionOrder sort){
+        switch (sort)
+        {
+            case MISSION_ORDER:
+                lambdaQueryWrapper.orderByDesc(ProjectMission::getMissionOrder);
+                break;
+            case UPDATE_TIME:
+                lambdaQueryWrapper.orderByDesc(ProjectMission::getUpdateTime);
+                break;
+            case CREATE_TIME:
+                lambdaQueryWrapper.orderByDesc(ProjectMission::getCreateTime);
+                break;
+        }
+    }
+
 }

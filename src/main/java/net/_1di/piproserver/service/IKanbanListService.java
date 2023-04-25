@@ -18,6 +18,7 @@ public interface IKanbanListService extends IService<KanbanList> {
 
     public List<KanbanList> getKabanListByProjectId(Integer projectId);
 
+
     /**
      * 删除看板下所有任务和看板，即设置为-1的状态
      * @param kanbanList

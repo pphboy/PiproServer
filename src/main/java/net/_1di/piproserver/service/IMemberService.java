@@ -44,4 +44,11 @@ public interface IMemberService extends IService<Member> {
      * @return
      */
     public List<Member> getMembersByProjectId(Integer projectId);
+
+    /**
+     * 获取任务下 所有的用户
+     * @param missionId 任务ID
+     * @return
+     */
+    public List<Member> getMembersByMissionId(String missionId);
 }

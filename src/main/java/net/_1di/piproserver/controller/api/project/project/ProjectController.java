@@ -9,6 +9,7 @@ import net._1di.piproserver.controller.api.project.project.dto.MissionTodayAndLa
 import net._1di.piproserver.controller.api.project.project.vo.ProjectVo;
 import net._1di.piproserver.entity.Member;
 import net._1di.piproserver.entity.Project;
+import net._1di.piproserver.enums.MissionOrder;
 import net._1di.piproserver.pojo.Result;
 import net._1di.piproserver.service.IMemberService;
 import net._1di.piproserver.service.IProjectService;
@@ -87,7 +88,7 @@ public class ProjectController {
         {
             MissionTodayAndLastDto missionListByMember = projectService.getMissionListByMember(member,projectId);
             if(ObjectUtils.isEmpty(missionListByMember)){
-                return resultUtil.fail("你没有任何任务");
+                return resultUtil.success("你没有任何任务",new MissionTodayAndLastDto());
             }
             return resultUtil.success("获取项目任务列表成功",missionListByMember);
         }
@@ -95,5 +96,12 @@ public class ProjectController {
         return resultUtil.fail("获取项目自己任务列表失败，你未参加该项目，这是非法访问");
     }
 
+    @GetMapping("/missions")
+    @ApiOperation("获取当前用户所有的任务，根据更新时间排序")
+    public Result getMissionOfMember(@RequestAttribute("member") Member member){
+        return resultUtil.success("获取任务成功",
+                // 按 更新时间进行排序
+                projectService.getAllMissionOfMember(member, MissionOrder.UPDATE_TIME));
+    }
 
 }
