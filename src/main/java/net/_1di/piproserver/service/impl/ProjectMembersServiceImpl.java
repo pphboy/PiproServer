@@ -14,7 +14,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,8 +38,16 @@ public class ProjectMembersServiceImpl extends ServiceImpl<ProjectMembersMapper,
     public List<Member> getMemberListNotJoinTheProject(Integer projectId) {
         // 查询当前项目所有的参与成员
         List<ProjectMembers> joinList = this.list(new QueryWrapper<ProjectMembers>().lambda().eq(ProjectMembers::getProjectId, projectId));
+        // 查询当前项目所有被删除的参与成员
         // 查询不在当前项目的所有参与成员
-        return memberService.list(new QueryWrapper<Member>().lambda().notIn(Member::getMemberId,joinList.stream().map(a->a.getMemberId()).toArray()));
+
+        List<Member> memberList = memberService.list(new QueryWrapper<Member>().lambda().notIn(Member::getMemberId,
+                // 只需要排序Delete因为disabled是不能被重新添加的
+                joinList.stream().filter(
+                    a -> a.getProjectAuthority()!=ProjectMemberStatus.DELETE
+                ).map(a->a.getMemberId()).toArray())
+        );
+        return memberList;
     }
 
     @Override
@@ -48,6 +58,7 @@ public class ProjectMembersServiceImpl extends ServiceImpl<ProjectMembersMapper,
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean addUserToProject(Integer memberId, Integer projectId) {
         ProjectMembers realNotExist = getOne(new QueryWrapper<ProjectMembers>().lambda().eq(
                         ProjectMembers::getMemberId,memberId)
@@ -56,7 +67,10 @@ public class ProjectMembersServiceImpl extends ServiceImpl<ProjectMembersMapper,
         // 就是有可能被删除过
         if(ObjectUtils.isNotEmpty(realNotExist)) {
             realNotExist.setProjectAuthority(ProjectMemberStatus.DEFAULT);
-            return updateById(realNotExist);
+            // 重新更新
+            return update(realNotExist,new QueryWrapper<ProjectMembers>().lambda()
+                .eq(ProjectMembers::getMemberId,realNotExist.getMemberId())
+                .eq(ProjectMembers::getProjectId,realNotExist.getProjectId()));
         }
         // 创建一个普通成员对象
         ProjectMembers projectMembers = new ProjectMembers(projectId, memberId, ProjectMemberStatus.DEFAULT);
@@ -64,6 +78,7 @@ public class ProjectMembersServiceImpl extends ServiceImpl<ProjectMembersMapper,
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean setUserDeleteStatus(AddProjectUserDto addProjectUserDto) {
         ProjectMembers projectMember = getOne(new QueryWrapper<ProjectMembers>().lambda().eq(
                         ProjectMembers::getMemberId,addProjectUserDto.getMemberId())
