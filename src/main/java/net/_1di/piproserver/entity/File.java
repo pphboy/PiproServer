@@ -6,10 +6,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * <p>
@@ -23,6 +25,7 @@ import lombok.Setter;
 @Setter
 @TableName("pi_file")
 @ApiModel(value = "File对象", description = "文件")
+@Accessors(chain = true)
 public class File implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,7 +35,11 @@ public class File implements Serializable {
     private String fileId;
 
     @ApiModelProperty("会员标识")
+    @JsonIgnore
     private Integer memberId;
+
+    @TableField(exist = false)
+    private Member member;
 
     @ApiModelProperty("文件目录标识")
     private Integer fileDirectoryId;

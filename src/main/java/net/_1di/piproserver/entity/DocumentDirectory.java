@@ -33,6 +33,9 @@ public class DocumentDirectory implements Serializable {
     @ApiModelProperty("项目标识")
     private Integer projectId;
 
+    @ApiModelProperty("父文档目录")
+    private Integer parentId;
+
     @ApiModelProperty("文件目录名")
     private String fileDirectoryTitle;
 

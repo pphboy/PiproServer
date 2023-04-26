@@ -32,8 +32,10 @@ spring:
 
 logging:
   file:
-    name: pipro.log
-    path: classpath:/
+#    直接通过name就可以设置路径
+#    Path应该是打包的路径
+    name: log/pipro.log
+    path: log/
   level:
     pinfo: INFO
     pdebug : DEBUG

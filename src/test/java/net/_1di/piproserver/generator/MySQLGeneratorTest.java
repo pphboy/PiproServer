@@ -27,7 +27,7 @@ public class MySQLGeneratorTest {
         .schema("baomidou")
         .build();
 
-    @Test
+//    @Test
     public void generate() {
         FastAutoGenerator.create("jdbc:mysql://localhost:3306/pipro?serverTimezone=Asia/Shanghai", "root", "123123")
                 .globalConfig(builder -> {

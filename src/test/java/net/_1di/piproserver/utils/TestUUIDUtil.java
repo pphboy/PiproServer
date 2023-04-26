@@ -18,4 +18,9 @@ public class TestUUIDUtil {
         long end = System.currentTimeMillis()-start;
         System.out.println((end)+"ms");
     }
+
+    @Test
+    public void testClassPath(){
+        System.out.println(UUIDUtil.class.getResource(""));
+    }
 }

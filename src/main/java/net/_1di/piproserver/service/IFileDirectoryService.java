@@ -3,6 +3,8 @@ package net._1di.piproserver.service;
 import net._1di.piproserver.entity.FileDirectory;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -12,5 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2023-04-16
  */
 public interface IFileDirectoryService extends IService<FileDirectory> {
+
+    List<FileDirectory> getFileDirectoriesByProjectId(Integer projectId);
 
 }
