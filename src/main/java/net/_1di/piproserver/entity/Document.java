@@ -1,10 +1,15 @@
 package net._1di.piproserver.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -33,12 +38,19 @@ public class Document implements Serializable {
     @ApiModelProperty("文档目录标识")
     private Integer documentDirectoryId;
 
-    @ApiModelProperty("文件名")
-    private String filename;
+    @ApiModelProperty("文档状态")
+    private Integer fileStatus;
 
-    @ApiModelProperty("文件路径")
-    private String filePath;
+    @ApiModelProperty("文档标题")
+    private String documentTitle;
+
+    @ApiModelProperty("文档内容")
+    private String documentContent;
 
     @ApiModelProperty("创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(fill = FieldFill.INSERT)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 }

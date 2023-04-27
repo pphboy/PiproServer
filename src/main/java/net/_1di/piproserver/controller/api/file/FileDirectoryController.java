@@ -47,9 +47,25 @@ public class FileDirectoryController {
     @GetMapping("/{id}")
     @ApiOperation("获取当前项目的所有文件夹")
     public Result getProjectFileList(@RequestAttribute("member") Member member, @PathVariable("id")Integer projectId){
-
         if(projectService.isMemberJoinTheProject(member.getMemberId(),projectId)){
             return resultUtil.success("获取文件成功",fileDirectoryService.getCacheFileDirectoriesByProjectId(projectId));
+        }else {
+            log.info("用户 【{}】 正在非法获取项目 【{}】的文件列表",member.getMemberId(),projectId);
+            return resultUtil.fail("非法操作，无法获得未参加项目的文件列表");
+        }
+    }
+
+    @PostMapping("/detail/{id}")
+    @ApiOperation("获取当前项目的所有文件夹")
+    public Result getDirectoryDetailById(@RequestAttribute("member") Member member, @PathVariable("id")Integer directoryId){
+        FileDirectory validDirectory= fileDirectoryService.getFileDirectoryById(directoryId);
+        if(ObjectUtils.isEmpty(validDirectory)){
+            log.info("用户 【{}】 正在非法获取一个不存在的目录列表 【{}】",member.getMemberId(),directoryId);
+            return resultUtil.fail("非法操作，文件列表不存在");
+        }
+        Integer projectId = validDirectory.getProjectId();
+        if(projectService.isMemberJoinTheProject(member.getMemberId(),projectId)){
+            return resultUtil.success("获取文件成功",fileDirectoryService.getFileDirectoryById(projectId));
         }else {
             log.info("用户 【{}】 正在非法获取项目 【{}】的文件列表",member.getMemberId(),projectId);
             return resultUtil.fail("非法操作，无法获得未参加项目的文件列表");

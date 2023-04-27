@@ -43,8 +43,10 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
     public List<FileDirectory> getFileDirectoriesByProjectId(Integer projectId) {
         List<FileDirectory> directories = list(new QueryWrapper<FileDirectory>().lambda()
                 .eq(FileDirectory::getProjectId, projectId)
+                // 只查询根目录
+                .isNull(FileDirectory::getParentId)
                 // 所有能查到的列表的结果都必须大于等于默认值
-                .ge(FileDirectory::getFileDocumentStatus, FileStatus.DEFAULT)
+                .ge(FileDirectory::getFileDocumentStatus, FileStatus.DEFAULT.value)
         );
         // TODO: 把这个接口完成
         // 查询每个文件目录的子目录和子文件
@@ -63,7 +65,13 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
 
     @Override
     public List<FileDirectory> getCacheFileDirectoriesByProjectId(Integer projectId) {
-        return (List<FileDirectory>) redisUtil.get(String.format(getRedisKey(projectId),projectId));
+        Object object = redisUtil.get(String.format(getRedisKey(projectId), projectId));
+        // 如果为空则更新
+        if(ObjectUtils.isEmpty(object) ){
+            updateDirectoriesIntoCache(projectId);
+            object = redisUtil.get(String.format(getRedisKey(projectId), projectId));
+        }
+        return (List<FileDirectory>) object;
     }
 
 
@@ -79,6 +87,7 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
                 .lambda().eq(FileDirectory::getParentId, directory.getFileDirectoryId())
                 // 子目录也需要大于默认值
                 .ge(FileDirectory::getFileDocumentStatus,FileStatus.DEFAULT));
+
         // 查询子文件
         directory.setFileList(fileService.list(new QueryWrapper<File>()
                 .lambda().eq(File::getFileDirectoryId,directory.getFileDirectoryId())));
@@ -86,11 +95,11 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
         // 这里是一个递归，有多少层就查多少个
         if(ObjectUtils.isNotEmpty(childDirectories)){
             // 查询子目录
-            List<FileDirectory> childs = new ArrayList<>();
-            for (FileDirectory fileDirectory: childDirectories){
-                childs.add(getFileDirectoryById(fileDirectory.getFileDirectoryId()));
+            List<FileDirectory> directories = new ArrayList<>();
+            for (FileDirectory tmpF:childDirectories){
+                directories.add(getFileDirectoryById(tmpF.getFileDirectoryId()));
             }
-            directory.setChildDirectoryList(childs);
+            directory.setChildDirectoryList(directories);
         }
 
         return directory;

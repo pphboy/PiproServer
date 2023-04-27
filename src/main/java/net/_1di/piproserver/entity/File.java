@@ -61,6 +61,8 @@ public class File implements Serializable {
 
     @ApiModelProperty("文件名")
     private String filename;
+    @ApiModelProperty("文件状态")
+    private Integer fileStatus;
 
     @ApiModelProperty("文件路径")
     private String filePath;
@@ -71,4 +73,11 @@ public class File implements Serializable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
+
+    @ApiModelProperty("更新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime updateTime;
 }

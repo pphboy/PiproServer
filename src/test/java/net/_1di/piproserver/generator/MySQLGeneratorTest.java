@@ -27,7 +27,7 @@ public class MySQLGeneratorTest {
         .schema("baomidou")
         .build();
 
-//    @Test
+    @Test
     public void generate() {
         FastAutoGenerator.create("jdbc:mysql://localhost:3306/pipro?serverTimezone=Asia/Shanghai", "root", "123123")
                 .globalConfig(builder -> {
@@ -43,7 +43,7 @@ public class MySQLGeneratorTest {
                 })
                 .strategyConfig(builder -> {
                     builder
-                            .addInclude("pi_mission_member") // 设置需要生成的表名，不写就是全部
+                            .addInclude("pi_file,pi_document") // 设置需要生成的表名，不写就是全部
                             .addTablePrefix("pi_" )
                             .entityBuilder()
                             .enableLombok() // 开启lombok
