@@ -1,5 +1,6 @@
 package net._1di.piproserver.utils;
 
+import net._1di.piproserver.enums.FileStatus;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -22,5 +23,9 @@ public class TestUUIDUtil {
     @Test
     public void testClassPath(){
         System.out.println(UUIDUtil.class.getResource(""));
+    }
+    @Test
+    public void testEnum(){
+        System.out.println(FileStatus.DELETE);
     }
 }
