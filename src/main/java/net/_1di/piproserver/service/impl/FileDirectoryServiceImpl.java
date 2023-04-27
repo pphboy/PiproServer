@@ -90,7 +90,9 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
 
         // 查询子文件
         directory.setFileList(fileService.list(new QueryWrapper<File>()
-                .lambda().eq(File::getFileDirectoryId,directory.getFileDirectoryId())));
+                .lambda().eq(File::getFileDirectoryId,directory.getFileDirectoryId())
+                // 子文件必须大于等于默认值
+                .ge(File::getFileStatus,FileStatus.DEFAULT.value)));
 
         // 这里是一个递归，有多少层就查多少个
         if(ObjectUtils.isNotEmpty(childDirectories)){
