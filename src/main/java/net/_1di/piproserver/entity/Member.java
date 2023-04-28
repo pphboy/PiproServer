@@ -13,9 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
@@ -33,6 +31,8 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "Member对象", description = "用户")
 @JsonIgnoreProperties({"password","salt"})
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Member implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -59,7 +59,6 @@ public class Member implements Serializable {
 
     @ApiModelProperty("注册时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    @DateTimeFormat(pattern=”yyyy-MM-dd HH:mm:ss”)
     @TableField(fill = FieldFill.INSERT)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

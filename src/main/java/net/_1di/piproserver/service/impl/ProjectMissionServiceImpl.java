@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +44,9 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
 
     @Autowired
     IProjectMissionRelaLabelService projectMissionRelaLabelService;
+
+    @Autowired
+    IMessageService messageService;
 
     @Override
     public List<ProjectMission> getMissionsByKanbanId(Integer kanbanId) {
@@ -165,7 +169,8 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
                 missionMemberService.save(new MissionMember(projectMission.getMissionId(), memberId));
             }
         }
-
+        // 给用户发信息
+        messageService.sendMessageByBot(new ArrayList<Integer>(missionVo.getMemberList()),"获取任务",String.format("你获取了任务 {%s}",projectMission.getMissionTitle()));
         return true;
     }
 
@@ -209,6 +214,7 @@ public class ProjectMissionServiceImpl extends ServiceImpl<ProjectMissionMapper,
             }
         }
 
+        messageService.sendMessageByBot(new ArrayList<>(missionVo.getMemberList()),"任务更新",String.format("你的任务更新了 {%s},快速查看",projectMission.getMissionTitle()));
         return resultUtil.success("编辑任务成功");
     }
 
