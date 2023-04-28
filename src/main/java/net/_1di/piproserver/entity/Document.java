@@ -31,6 +31,23 @@ public class Document implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public Document(String documentId, String documentTitle, String documentContent) {
+        this.documentId = documentId;
+        this.documentTitle = documentTitle;
+        this.documentContent = documentContent;
+    }
+
+    public Document(String documentId, Integer fileStatus) {
+        this.documentId = documentId;
+        this.fileStatus = fileStatus;
+    }
+
+    public Document(Integer documentDirectoryId, String documentTitle, String documentContent) {
+        this.documentDirectoryId = documentDirectoryId;
+        this.documentTitle = documentTitle;
+        this.documentContent = documentContent;
+    }
+
     @ApiModelProperty("文档标识")
     @TableId(type= IdType.ASSIGN_UUID)
     private String documentId;
@@ -43,6 +60,7 @@ public class Document implements Serializable {
 
     @ApiModelProperty("文档标题")
     private String documentTitle;
+
 
     @ApiModelProperty("文档内容")
     private String documentContent;

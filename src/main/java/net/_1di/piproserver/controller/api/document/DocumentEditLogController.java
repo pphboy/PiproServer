@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @since 2023-04-16
  */
 @Controller
-@RequestMapping("/piproserver/documentEditLog")
+@RequestMapping("/project/document/log")
 public class DocumentEditLogController {
 
 }

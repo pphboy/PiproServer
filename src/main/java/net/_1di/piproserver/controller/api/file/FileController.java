@@ -95,12 +95,7 @@ public class FileController {
             log.info("用户【{}】 正在尝试修改项目[{}] 中的文件[{}]文件名,但文件不存在",member.getMemberId(),fileUpdateVo.getProjectId(),fileUpdateVo.getFileId());
             return resultUtil.fail("非法操作，文件不存在");
         }
-        // 判断文件目录是否合法，如果文件目录不合法，则其文件也不能修改
-        FileDirectory validDirectory = fileDirectoryService.getValidDirectory(validFile.getFileDirectoryId());
-        if(ObjectUtils.isEmpty(validDirectory)){
-            log.info("用户【{}】  正在尝试非法修改 项目【{}】文件目录【{}】文件【{}】: 文件目录不存在",member.getMemberId(),fileUpdateVo.getProjectId(),validFile.getFileDirectoryId(),fileUpdateVo.getFileId());
-            return resultUtil.fail("非法操作，文件目录不存在");
-        }
+
         if(fileService.fileRename(fileUpdateVo)){
             return resultUtil.success("修改文件文件成功");
         }else {
@@ -126,12 +121,7 @@ public class FileController {
             log.info("用户【{}】 正在尝试删除项目[{}] 中的文件[{}],但文件不存在",member.getMemberId(),deleteFileVo.getProjectId(),deleteFileVo.getFileId());
             return resultUtil.fail("非法操作，文件不存在");
         }
-        // 判断文件目录是否合法
-        FileDirectory validDirectory = fileDirectoryService.getValidDirectory(validFile.getFileDirectoryId());
-        if(ObjectUtils.isEmpty(validDirectory)){
-            log.info("用户【{}】,正在尝试非法删除到项目【{}】文件目录【{}】中的文件: 文件目录不存在",member.getMemberId(),deleteFileVo.getProjectId(),validFile.getFileDirectoryId());
-            return resultUtil.fail("非法操作，文件目录不存在");
-        }
+
         if(fileService.deleteFile(deleteFileVo)){
             return resultUtil.success("删除文件成功");
         }else {

@@ -1,6 +1,7 @@
 package net._1di.piproserver.aop;
 
 import net._1di.piproserver.annotations.cache.UpdateFileDirectoryCache;
+import net._1di.piproserver.service.IDocumentDirectoryService;
 import net._1di.piproserver.service.IFileDirectoryService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.aspectj.lang.JoinPoint;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Component;
 public class FileDirectoryCacheAop {
     @Autowired
     IFileDirectoryService fileDirectoryService;
+    @Autowired
+    IDocumentDirectoryService documentDirectoryService;
 
     // 这是一个切点，相当于一个入口
     @Pointcut("@annotation(net._1di.piproserver.annotations.cache.UpdateFileDirectoryCache)")
@@ -42,6 +45,7 @@ public class FileDirectoryCacheAop {
                         fileDirectoryService.updateDirectoriesIntoCache(projectId);
                         break;
                     case "DOC":
+                        documentDirectoryService.updateDirectoriesIntoCache(projectId);
                         break;
                 }
             }

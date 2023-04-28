@@ -8,6 +8,7 @@ import net._1di.piproserver.annotations.VerifyToken;
 import net._1di.piproserver.controller.api.file.vo.DeleteDirectoryVo;
 import net._1di.piproserver.controller.api.file.vo.DirectoryVo;
 import net._1di.piproserver.controller.api.file.vo.RenameDirectoryVo;
+import net._1di.piproserver.entity.DocumentDirectory;
 import net._1di.piproserver.entity.FileDirectory;
 import net._1di.piproserver.entity.Member;
 import net._1di.piproserver.pojo.Result;

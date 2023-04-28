@@ -27,6 +27,8 @@ public interface IFileService extends IService<File> {
 
     /**
      * 获取合法的文件
+     * 如果文件不合法，返回空
+     * 如果文件父目录不合法，或者父目录的父目录不合法，返回空
      * @param file
      * @return
      */

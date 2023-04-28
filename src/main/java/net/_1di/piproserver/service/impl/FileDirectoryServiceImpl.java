@@ -39,7 +39,6 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
     RedisUtil redisUtil;
 
     @Override
-    @Cacheable
     public List<FileDirectory> getFileDirectoriesByProjectId(Integer projectId) {
         List<FileDirectory> directories = list(new QueryWrapper<FileDirectory>().lambda()
                 .eq(FileDirectory::getProjectId, projectId)
@@ -65,11 +64,11 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
 
     @Override
     public List<FileDirectory> getCacheFileDirectoriesByProjectId(Integer projectId) {
-        Object object = redisUtil.get(String.format(getRedisKey(projectId), projectId));
+        Object object = redisUtil.get(getRedisKey(projectId));
         // 如果为空则更新
         if(ObjectUtils.isEmpty(object) ){
             updateDirectoriesIntoCache(projectId);
-            object = redisUtil.get(String.format(getRedisKey(projectId), projectId));
+            object = redisUtil.get(getRedisKey(projectId));
         }
         return (List<FileDirectory>) object;
     }
@@ -109,8 +108,8 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
 
 
     @Override
-    public FileDirectory getValidDirectory(Integer directoryStatus) {
-        FileDirectory directory = getById(directoryStatus);
+    public FileDirectory getValidDirectory(Integer directoryId) {
+        FileDirectory directory = getById(directoryId);
         // 显然不能为空
         if(ObjectUtils.isEmpty(directory)){
             return null;
@@ -119,6 +118,10 @@ public class FileDirectoryServiceImpl extends ServiceImpl<FileDirectoryMapper, F
         if(directory.getFileDocumentStatus() < 0){
             return null;
         }
+        // 又是递归，父目录的父目录都不能是禁用状态
+        // 父目录ID不为空的时候，父目录必须合法，不合法就是NULL
+        if( ObjectUtils.isNotEmpty(directory.getParentId()) && ObjectUtils.isEmpty(getValidDirectory(directory.getParentId()))) return null;
+
         return directory;
     }
 
