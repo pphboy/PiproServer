@@ -36,6 +36,5 @@ public class UpdateDocumentVo {
     private String documentTitle;
     @ApiModelProperty("文档内容")
     @NotEmpty(message = "文档内容不能为空")
-    @Length(min = 6,message = "至少写点东西吧")
     private String documentContent;
 }

@@ -1,6 +1,7 @@
 package net._1di.piproserver.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import net._1di.piproserver.annotations.cache.UpdateFileDirectoryCache;
 import net._1di.piproserver.controller.api.document.vo.CreateDocumentVo;
 import net._1di.piproserver.controller.api.document.vo.DeleteDocumentVo;
 import net._1di.piproserver.controller.api.document.vo.UpdateDocumentVo;
@@ -29,12 +30,6 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document> i
     @Autowired
     IDocumentDirectoryService documentDirectoryService;
 
-    @Override
-    public boolean saveDocument(CreateDocumentVo createDocumentVo){
-        return save(new Document(createDocumentVo.getDirectoryId()
-                ,createDocumentVo.getDocumentTitle()
-                ,createDocumentVo.getDocumentContent()));
-    }
 
     @Override
     public Document getValidDocument(String documentId) {
@@ -44,13 +39,21 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document> i
         if(ObjectUtils.isEmpty(documentDirectoryService.getValidDirectory(validDocument.getDocumentDirectoryId()))) return null;
         return validDocument;
     }
+    @Override
+    @UpdateFileDirectoryCache(type = "DOC")
+    public boolean saveDocument(CreateDocumentVo createDocumentVo){
+        return save(new Document(createDocumentVo.getDirectoryId()
+                ,createDocumentVo.getDocumentTitle()));
+    }
 
     @Override
+    @UpdateFileDirectoryCache(type = "DOC")
     public boolean deleteFile(DeleteDocumentVo deleteDocumentVo) {
         return updateById(new Document(deleteDocumentVo.getDocumentId(),FileStatus.DELETE.value));
     }
 
     @Override
+    @UpdateFileDirectoryCache(type = "DOC")
     public boolean updateDocument(UpdateDocumentVo updateDocumentVo) {
         return updateById(new Document(updateDocumentVo.getDocumentId(),updateDocumentVo.getDocumentTitle(),updateDocumentVo.getDocumentContent()));
     }

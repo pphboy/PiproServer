@@ -12,8 +12,11 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * <p>
@@ -26,6 +29,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("pi_document")
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel(value = "Document对象", description = "文档")
 public class Document implements Serializable {
 
@@ -35,6 +41,11 @@ public class Document implements Serializable {
         this.documentId = documentId;
         this.documentTitle = documentTitle;
         this.documentContent = documentContent;
+    }
+
+    public Document(Integer documentDirectoryId, String documentTitle) {
+        this.documentDirectoryId = documentDirectoryId;
+        this.documentTitle = documentTitle;
     }
 
     public Document(String documentId, Integer fileStatus) {
@@ -71,4 +82,11 @@ public class Document implements Serializable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
+
+    @ApiModelProperty("更新时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime updateTime;
 }

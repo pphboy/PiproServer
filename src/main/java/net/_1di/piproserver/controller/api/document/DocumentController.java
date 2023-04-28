@@ -49,7 +49,7 @@ public class DocumentController {
 
     @PostMapping
     @ApiOperation("文档创建目录")
-    public Result creaeteDocument(@RequestAttribute("member") Member member, @RequestBody @Valid CreateDocumentVo createDocumentVo) throws IOException {
+    public Result createDocument(@RequestAttribute("member") Member member, @RequestBody @Valid CreateDocumentVo createDocumentVo) throws IOException {
         // 判断当前用户是不是在本项目内
         if(!projectService.isMemberJoinTheProject(member.getMemberId(),createDocumentVo.getProjectId())){
             log.info("用户【{}】  正在尝试非法创建文档 到 项目【{}】",member.getMemberId(),createDocumentVo.getProjectId());
@@ -80,7 +80,7 @@ public class DocumentController {
      */
     @PutMapping
     @ApiOperation("文档更新")
-    public Result documentRename(@RequestAttribute("member") Member member
+    public Result updateDocument(@RequestAttribute("member") Member member
             , @RequestBody @Valid UpdateDocumentVo documentVo){
         // 判断当前用户是不是在本项目内
         if(!projectService.isMemberJoinTheProject(member.getMemberId(),documentVo.getProjectId())){

@@ -75,7 +75,6 @@ public class FileDirectory implements Serializable {
     private Integer parentId;
 
     @ApiModelProperty("项目标识")
-    @JsonIgnore
     private Integer projectId;
 
     @ApiModelProperty("文件目录名")

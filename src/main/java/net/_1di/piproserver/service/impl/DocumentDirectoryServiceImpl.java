@@ -77,12 +77,12 @@ public class DocumentDirectoryServiceImpl extends ServiceImpl<DocumentDirectoryM
         DocumentDirectory directory = getOne(new QueryWrapper<DocumentDirectory>().lambda()
                 .eq(DocumentDirectory::getDocumentDirectoryId,directoryId)
                 // 所有能查到的列表结果都必须大于等于默认值
-                .ge(DocumentDirectory::getFileDocumentStatus,FileStatus.DEFAULT));
+                .ge(DocumentDirectory::getFileDocumentStatus,FileStatus.DEFAULT.value));
 
         List<DocumentDirectory> childDirectories = list(new QueryWrapper<DocumentDirectory>()
                 .lambda().eq(DocumentDirectory::getParentId, directory.getDocumentDirectoryId())
                 // 子目录也需要大于默认值
-                .ge(DocumentDirectory::getFileDocumentStatus,FileStatus.DEFAULT));
+                .ge(DocumentDirectory::getFileDocumentStatus,FileStatus.DEFAULT.value));
 
         // 查询子文件
         directory.setDocumentList(documentService.list(new QueryWrapper<Document>()
