@@ -18,6 +18,20 @@ import java.util.List;
 public interface IMemberService extends IService<Member> {
 
     /**
+     * 更新 用户 邮箱或密码
+     * @param member
+     * @return
+     */
+    boolean updateUserInfo(Member member);
+
+    /**
+     * 判断成员的密码是否正确
+     * @param memberId
+     * @param password
+     * @return
+     */
+    boolean checkPasswordValid(Integer memberId,String password);
+    /**
      * 注册时用于返回 总配置
      * @param member
      * @return

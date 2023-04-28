@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net._1di.piproserver.annotations.VerifyToken;
 import net._1di.piproserver.controller.system.member.vo.LoginMember;
 import net._1di.piproserver.controller.system.member.vo.RegisterMember;
+import net._1di.piproserver.controller.system.member.vo.UpdateMemberVo;
 import net._1di.piproserver.entity.Member;
 import net._1di.piproserver.pojo.MemberConfig;
 import net._1di.piproserver.pojo.Result;
@@ -16,6 +18,7 @@ import net._1di.piproserver.utils.UUIDUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -100,4 +103,5 @@ public class SystemMemberController {
         MemberConfig memberConfig = memberService.memberRegister(registerMember);
         return resultUtil.success("注册成功",memberConfig);
     }
+
 }

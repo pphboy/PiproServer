@@ -17,6 +17,7 @@ import net._1di.piproserver.utils.UUIDUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,35 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Autowired
     IMissionMemberService missionMemberService;
+
+    /**
+     * Member传过来的密码是前端的明文密码，需要经过加密
+     * @param member
+     * @return
+     */
+    @Override
+    public boolean updateUserInfo(Member member) {
+        if(StringUtils.isNotEmpty(member.getPassword())){
+            String salt = uuidUtil.uuid().substring(0,6);
+            member.setSalt(salt);
+            // 密码+盐
+            String submitPasswordPlusSaltCrypt = DigestUtils.sha256Hex(member.getPassword()+salt);
+            // 更新密码
+            member.setPassword(submitPasswordPlusSaltCrypt);
+
+        }
+        return updateById(member);
+    }
+
+    @Override
+    public boolean checkPasswordValid(Integer memberId, String password) {
+        Member selectOne = getById(memberId);
+        String repass = DigestUtils.sha256Hex(password+selectOne.getSalt());
+        if(selectOne.getPassword().equals(repass)) {
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public MemberConfig memberRegister(RegisterMember member) {
